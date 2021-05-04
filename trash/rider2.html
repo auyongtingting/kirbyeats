@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiderUI</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.js"></script>
+<body>
+    <div id="app" class="container">
+        <h1>Rider</h1>
+        <table border=1>
+            <tr>
+                <th>CustomerName</th>
+                <th>ItemID</th>
+                <th>RestaurantName</th>
+                <th>Postal</th>
+                <th>Travel Time</th>
+                <th>Distance</th>
+                
+            </tr>
+            <tr>
+                <td>{{CustomerName}}</td>
+                <td>{{Item}}</td>
+                <td>{{RestaurantName}}</td>
+                <td> postal </td>
+                <td> time </td>
+                <td> dist </td>
+
+            </tr>
+        </table>
+        
+    </div>
+
+    <div id="customer" class="container">
+        <h1>Customer</h1>
+        <table border=1>
+            <tr>
+                <th>Customer</th>
+                <th>Contact</th>
+                <th>Address</th>
+                <th>Postal</th>
+                <th>Travel Time</th>
+                <th>Distance</th>
+            </tr>
+            <tr>
+                <td>{{ Name }}</td>
+                <td>{{ Phone }}</td>
+                <td>{{ Address }}</td>
+                <td>{{ Postal }}</td>
+                <td>{{ timeDist.time }}</td>
+                <td>{{ timeDist.distance }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    
+    
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                CustomerName : null,
+                Item : null,
+                RestaurantName : null,
+                Name: null,
+                Phone: null,
+                Address: null,
+                Postal: null
+
+            },
+            created: function(){
+                axios.get("http://127.0.0.1:5002/order/rider/1")
+                .then(response=>{
+                    order = response.data.data
+                    console.log(order)
+                    this.CustomerName = order.customerName
+                    this.Item = order.order_item[0].itemID
+                    this.RestaurantName = order.restaurantName
+                    
+                    
+                })
+                .catch(error =>{
+                    this.restaurants = [{entry: "there was an error: " + error.message}]
+                })
+            }
+            
+        })
+
+        new Vue({
+            el: "#customer",
+            data: {
+                Name: null,
+                Phone: null,
+                Address: null,
+                Postal: null,
+                timeDist: []
+            },
+            methods: {
+                getTimeDist: function () {
+                    var get_distance_URL = "http://127.0.0.1:5007/gmaps/" + "Singapore SMU"; //destination is hardcoded for now
+                    const response =
+                        fetch(get_distance_URL)
+                            .then(response => response.json())
+                            .then(data => {
+                                // console.log(response);
+                                if (data.code === 404) {
+                                    // no book in db
+                                    this.message = data.message;
+                                } else {
+                                    this.timeDist = data.data;
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+                }
+            },
+            created: function(){
+                axios.get("http://127.0.0.1:5006/customer/1")
+                .then(response=>{
+                    cust = response.data.data
+                    this.Name = cust.customerName
+                    this.Phone = cust.phone
+                    this.Address = cust.address
+                    this.Postal = cust.postalCode                    
+                
+                })
+                .catch(error =>{
+                    this.restaurants = [{entry: "there was an error: " + error.message}]
+                })
+                this.getTimeDist();
+            }
+        })
+    </script>
+</body>
+</html>

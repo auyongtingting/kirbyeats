@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>RiderUI</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--===============================================================================================-->	
+	<link rel="icon" type="css/Table_Responsive_v2/image/png" href="css/Table_Responsive_v2/images/icons/favicon.ico"/>
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/Table_Responsive_v2/vendor/bootstrap/css/bootstrap.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/Table_Responsive_v2/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/Table_Responsive_v2/vendor/animate/animate.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/Table_Responsive_v2/vendor/select2/select2.min.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/Table_Responsive_v2/vendor/perfect-scrollbar/perfect-scrollbar.css">
+<!--===============================================================================================-->
+	<link rel="stylesheet" type="text/css" href="css/Table_Responsive_v2/css/util.css">
+	<link rel="stylesheet" type="text/css" href="css/Table_Responsive_v2/css/main.css">
+<!--===============================================================================================-->
+<style>
+	.bg-cover {
+		background-size: cover !important;
+	}
+</style>
+</head>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.js"></script>
+
+<body>
+	<div style="background-image: url(img/header2.jpg);" class="jumbotron bg-cover text-white limiter" >
+		<div class="container py-5 text-center">
+			<h1 class="display-4 font-weight-bold">Rider</h1>
+		</div>
+	</div>
+	<div class="limiter">
+		<div class="container-table100">
+			<div class="wrap-table100">
+                
+					<div class="table" id='app'>
+
+						<div class="row header">
+							<div class="cell">
+								Customer Name
+							</div>
+							<div class="cell">
+								Item ID
+							</div>
+							<div class="cell">
+								Restaurant Name
+							</div>
+							<div class="cell">
+								Postal
+							</div>
+                            <div class="cell">
+								Travel Time
+							</div>
+                            <div class="cell" style="padding: 30px;">
+								Distance
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="cell" data-title="Customer Name">
+								{{CustomerName}}
+							</div>
+							<div class="cell" data-title="Item ID">
+								{{Item}}
+							</div>
+							<div class="cell" data-title="Restaurant Name">
+								{{RestaurantName}}
+							</div>
+							<div class="cell" data-title="Postal">
+								{{ Postal }}
+							</div>
+                            <div class="cell" data-title="Travel Time">
+								{{ appTimeDist.time }}
+							</div>
+                            <div class="cell" data-title="Distance" style="padding: 30px;">
+								{{ appTimeDist.distance }}
+							</div>
+						</div>
+
+					</div>
+			</div>
+		</div>
+
+        <div class="container-table100">
+			<div class="wrap-table100">
+					<div class="table" id='customer'>
+
+						<div class="row header">
+							<div class="cell">
+								Customer
+							</div>
+							<div class="cell">
+								Contact
+							</div>
+							<div class="cell">
+								Address
+							</div>
+							<div class="cell">
+								Postal
+							</div>
+                            <div class="cell">
+								Travel Time
+							</div>
+                            <div class="cell" style="padding: 30px;">
+								Distance
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="cell" data-title="Customer Name">
+								{{ Name }}
+							</div>
+							<div class="cell" data-title="Item ID">
+								{{ Phone }}
+							</div>
+							<div class="cell" data-title="Restaurant Name">
+								{{ Address }}
+							</div>
+							<div class="cell" data-title="Postal">
+								{{ PostalCust }}
+							</div>
+                            <div class="cell" data-title="Travel Time">
+								{{ timeDist.time }}
+							</div>
+                            <div class="cell" data-title="Distance" style="padding: 30px;">
+								{{ timeDist.distance }}
+							</div>
+						</div>
+
+					</div>
+			</div>
+		</div>
+	</div>
+
+
+	
+
+<!--===============================================================================================-->	
+	<script src="css/Table_Responsive_v2/vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+	<script src="css/Table_Responsive_v2/vendor/bootstrap/js/popper.js"></script>
+	<script src="css/Table_Responsive_v2/vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+	<script src="css/Table_Responsive_v2/vendor/select2/select2.min.js"></script>
+<!--===============================================================================================-->
+	<script src="css/Table_Responsive_v2/js/main.js"></script>
+
+    <script>
+
+		var get_rest_URL = "http://localhost:5005/restaurant/rider/Kopitiam";
+		console.log(get_rest_URL);
+		
+        new Vue({
+            el: "#app", 
+            data: {
+                CustomerName : null,
+                Item : null,
+                RestaurantName : null,
+                Name: null,
+                Phone: null,
+                Address: null,
+                Postal: null,
+				appTimeDist : []
+            },
+			methods: {
+                getRestaurantPostal: function () {
+                        // on Vue instance created, load the order list
+                        const response =
+                            fetch(get_rest_URL)
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.code === 404) {
+                                        // no book in db
+                                        this.message = data.message;
+                                    } else {
+                                        this.Postal = data.data.postalCode;
+										this.restPostal = data.data.postalCode;
+                                        console.log(this.restPostal);
+                                    }
+                                })
+                                .catch(error => {
+                                    // Errors when calling the service; such as network error, 
+                                    // service offline, etc
+                                    console.log(this.message + error);
+    
+                                });
+    
+                },
+				getTimeDist: function () {
+                    var get_distance_URL = "http://localhost:5007/gmaps/" + "529509"; //destination is hardcoded for now
+                    const response =
+                        fetch(get_distance_URL)
+                            .then(response => response.json())
+                            .then(data => {
+                                // console.log(response);
+                                if (data.code === 404) {
+                                    // no book in db
+                                    this.message = data.message;
+                                } else {
+                                    this.appTimeDist = data.data;
+									console.log(this.appTimeDist)
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+                }
+            },
+            created: function(){
+                axios.get("http://localhost:5002/order/rider/1")
+                .then(response=>{
+                    order = response.data.data
+                    console.log(order)
+                    this.CustomerName = order.customerName
+                    this.Item = order.order_item[0].itemID
+                    this.RestaurantName = order.restaurantName
+                    
+                })
+                .catch(error =>{
+                    this.restaurants = [{entry: "there was an error: " + error.message}]
+                })
+				this.getRestaurantPostal();
+				this.getTimeDist();
+            }
+            
+        })
+
+        new Vue({
+            el: "#customer",
+            data: {
+                Name: null,
+                Phone: null,
+                Address: null,
+                PostalCust: null,
+                timeDist: []
+            },
+            methods: {
+                getTimeDist: function () {
+                    var get_distance_URL = "http://localhost:5007/gmaps/" + "520334"; //destination is hardcoded for now
+                    const response =
+                        fetch(get_distance_URL)
+                            .then(response => response.json())
+                            .then(data => {
+                                // console.log(response);
+                                if (data.code === 404) {
+                                    // no book in db
+                                    this.message = data.message;
+                                } else {
+                                    this.timeDist = data.data;
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+                }
+            },
+            created: function(){
+                axios.get("http://localhost:5006/customer/1")
+                .then(response=>{
+                    cust = response.data.data
+                    this.Name = cust.customerName
+                    this.Phone = cust.phone
+                    this.Address = cust.address
+                    this.PostalCust = cust.postalCode                    
+                
+                })
+                .catch(error =>{
+                    this.restaurants = [{entry: "there was an error: " + error.message}]
+                })
+                this.getTimeDist();
+            }
+        })
+    </script>
+</body>
+</html>
